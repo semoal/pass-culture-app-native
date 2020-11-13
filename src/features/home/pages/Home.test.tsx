@@ -44,15 +44,23 @@ describe('Home component', () => {
     expect(() => home.getByText('Check update')).toThrowError()
   })
 
-  it('should have components and navigation buttons when NOT in PROD', async () => {
+  it('should have components and navigation buttons when ENV is NOT "staging" NOR "production"', async () => {
     const home = await renderHomeWithoutLoginModal()
 
     expect(() => home.getByText('Composants')).toBeTruthy()
     expect(() => home.getByText('Navigation')).toBeTruthy()
   })
 
-  it('should NOT have components or navigation buttons when in PROD', async () => {
+  it('should NOT have components or navigation buttons when ENV is "production"', async () => {
     env.ENV = 'production'
+    const home = await renderHomeWithoutLoginModal()
+
+    expect(() => home.getByText('Composants')).toThrowError()
+    expect(() => home.getByText('Navigation')).toThrowError()
+  })
+
+  it('should NOT have components or navigation buttons when ENV is "staging"', async () => {
+    env.ENV = 'staging'
     const home = await renderHomeWithoutLoginModal()
 
     expect(() => home.getByText('Composants')).toThrowError()

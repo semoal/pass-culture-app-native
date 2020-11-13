@@ -51,7 +51,7 @@ export const Home: FunctionComponent = function () {
   return (
     <SafeContainer>
       <ScrollView>
-        {env.ENV !== 'production' && (
+        {!['production', 'staging'].includes(env.ENV) && (
           <CheatButtonsContainer>
             <CheatTouchableOpacity onPress={() => navigation.navigate('AppComponents')}>
               <Typo.Body>{_(t`Composants`)}</Typo.Body>

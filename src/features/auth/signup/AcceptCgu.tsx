@@ -1,10 +1,11 @@
 import { t } from '@lingui/macro'
 import { useNavigation } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { FC } from 'react'
+import React, { FC, useRef } from 'react'
 import styled from 'styled-components/native'
 
 import { useSignUp } from 'features/auth/AuthContext'
+import { ReCaptchaComponent, ReCaptchaRef } from 'features/auth/ReCaptchaComponent'
 import { QuitSignupModal, SignupSteps } from 'features/auth/signup/QuitSignupModal'
 import { RootStackParamList, UseNavigationType } from 'features/navigation/RootNavigator'
 import { env } from 'libs/environment'
@@ -32,6 +33,7 @@ export const AcceptCgu: FC<Props> = ({ route }) => {
   const isNewsletterChecked = route.params.isNewsletterChecked
   const password = route.params.password
   const birthday = route.params.birthday
+  const reCaptchaRef = useRef<ReCaptchaRef>(null)
 
   const {
     visible: fullPageModalVisible,
@@ -39,12 +41,12 @@ export const AcceptCgu: FC<Props> = ({ route }) => {
     hideModal: hideFullPageModal,
   } = useModal(false)
 
-  async function subscribe() {
+  async function subscribe(reCaptchaToken: string) {
     await signUp({
       password: password,
       birthdate: birthday,
       hasAllowedRecommendations: isNewsletterChecked,
-      token: 'ABCDEF',
+      token: reCaptchaToken,
       email: email,
     })
     navigate('SignupConfirmationEmailSent', { email: email })
@@ -52,6 +54,7 @@ export const AcceptCgu: FC<Props> = ({ route }) => {
 
   return (
     <React.Fragment>
+      <ReCaptchaComponent ref={reCaptchaRef} onReceiveToken={(token: string) => subscribe(token)} />
       <BottomContentPage>
         <ModalHeader
           title={_(t`CGU & Données`)}
@@ -96,7 +99,10 @@ export const AcceptCgu: FC<Props> = ({ route }) => {
               icon={Email}
             />
             <Spacer.Column numberOfSpaces={6} />
-            <ButtonPrimary title={_(t`Accepter et s’inscrire`)} onPress={subscribe} />
+            <ButtonPrimary
+              title={_(t`Accepter et s’inscrire`)}
+              onPress={() => reCaptchaRef.current?.getReCaptchaToken()}
+            />
             <Spacer.Column numberOfSpaces={5} />
             <StepDots numberOfSteps={4} currentStep={4} />
           </CardContent>

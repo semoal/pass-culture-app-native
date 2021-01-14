@@ -11,6 +11,7 @@ interface Props {
   min?: number
   max?: number
   step?: number
+  onValuesChange?: (newValues: number[]) => void
 }
 const DEFAULT_MIN = 0
 const DEFAULT_MAX = 100
@@ -20,6 +21,11 @@ const DEFAULT_VALUES = [DEFAULT_MIN, DEFAULT_MAX]
 export const Slider: React.FC<Props> = (props) => {
   const { showValues, formatValues = (s: number) => s } = props
   const [values, setValues] = useState<number[]>(props.values || DEFAULT_VALUES)
+
+  const onValuesChange = (newValues: number[]) => {
+    setValues(newValues)
+    if (props.onValuesChange) props.onValuesChange(newValues)
+  }
 
   return (
     <React.Fragment>
@@ -42,7 +48,7 @@ export const Slider: React.FC<Props> = (props) => {
         markerStyle={markerStyle}
         pressedMarkerStyle={markerStyle}
         containerStyle={containerStyle}
-        onValuesChange={setValues}
+        onValuesChange={onValuesChange}
       />
     </React.Fragment>
   )

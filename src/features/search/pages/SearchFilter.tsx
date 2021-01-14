@@ -4,6 +4,7 @@ import { LayoutChangeEvent } from 'react-native'
 import styled from 'styled-components/native'
 
 import { RadiusSlider, PriceSlider } from 'features/search/components'
+import { FACETS_ENUM } from 'libs/algolia/enums'
 import { _ } from 'libs/i18n'
 import { PageHeader } from 'ui/components/headers/PageHeader'
 import { ColorsEnum, getSpacing, Spacer, Typo } from 'ui/theme'
@@ -24,7 +25,7 @@ export const SearchFilter: React.FC = () => (
         <Spacer.Column numberOfSpaces={16} />
         <RadiusSlider />
         <Separator />
-        <PriceSlider />
+        <PriceSlider attribute={FACETS_ENUM.OFFER_PRICE} />
       </Container>
     </React.Fragment>
     <PageHeader title={_(t`Filtrer`)} rightComponent={rightButton} />

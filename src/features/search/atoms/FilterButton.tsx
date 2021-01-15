@@ -10,10 +10,10 @@ import { ColorsEnum, UniqueColors, getSpacing, Spacer, Typo } from 'ui/theme'
 import { ACTIVE_OPACITY } from 'ui/theme/colors'
 import { BorderRadiusEnum } from 'ui/theme/grid'
 
-export const FilterButton: React.FC = () => {
+export const FilterButton: React.FC = (props) => {
   const { navigate } = useNavigation()
   return (
-    <Container onPress={() => navigate('SearchFilter')} testID="FilterButton">
+    <Container onPress={props.setIsModalOpen} testID="FilterButton">
       <StyledLinearGradient colors={[ColorsEnum.PRIMARY, UniqueColors.FILTER_BUTTON]} angle={106}>
         <Filter color={ColorsEnum.WHITE} />
         <Spacer.Row numberOfSpaces={1} />

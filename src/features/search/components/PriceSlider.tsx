@@ -11,6 +11,7 @@ const MAX_PRICE = 300
 const formatEuro = (price: number) => `${price} €`
 
 interface Props {
+  attribute: any
   currentRefinement: { min: number; max: number }
   min: number
   max: number
@@ -20,6 +21,8 @@ interface Props {
 
 const PriceSliderComponent: React.FC<Props> = (props) => {
   const { currentRefinement, refine } = props
+  console.log('PriceSliderComponent :', currentRefinement, refine)
+
   useEffect(() => {
     console.log('PriceSliderComponent in')
     return () => {
@@ -42,3 +45,4 @@ const PriceSliderComponent: React.FC<Props> = (props) => {
 }
 
 export const PriceSlider = connectRange(PriceSliderComponent)
+//==> modifie data algolia mais pas le contexte

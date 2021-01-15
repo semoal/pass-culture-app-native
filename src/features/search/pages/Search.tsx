@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { connectStats } from 'react-instantsearch-native'
+import React, { useEffect, useState } from 'react'
+import { connectStats, connectRange } from 'react-instantsearch-native'
 import { Platform } from 'react-native'
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust'
 import styled from 'styled-components/native'
@@ -8,13 +8,24 @@ import { TAB_BAR_COMP_HEIGHT } from 'features/navigation/TabBar/TabBarComponent'
 import { FilterButton } from 'features/search/atoms/FilterButton'
 import { InfiniteHits } from 'features/search/components/InfiniteHits'
 import { SearchHeader } from 'features/search/components/SearchHeader'
+import { FACETS_ENUM } from 'libs/algolia/enums'
 import { getSpacing, Spacer, Typo } from 'ui/theme'
 
-import { useSearchState } from './AlgoliaWrapper'
+import { AlgoliaWrapper, useSearchState } from './AlgoliaWrapper'
+import Filters from './Filters'
+import { useSearchContext } from './SearchContext'
 import { SearchFilter } from './SearchFilter'
+interface Props {
+  currentRefinement: { min: number; max: number }
+  refine: (args: { min: number; max: number }) => void
+}
 
-export const Search: React.FC = () => {
-  const searchState = useSearchState()
+export const Search: React.FC<Props> = (props) => {
+  // const { currentRefinement, refine } = props
+  // console.log('SearchComponent :', currentRefinement, refine)
+
+  const { searchState } = useSearchContext()
+  console.log('searchState : ', searchState)
   useEffect(() => {
     console.log('Search in, searchState', searchState)
     return () => {
@@ -29,23 +40,35 @@ export const Search: React.FC = () => {
     return () => Platform.OS === 'android' && AndroidKeyboardAdjust.setAdjustResize()
   }, [])
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(true)
+
   return (
+    // <AlgoliaWrapper>
     <Container>
       <SearchHeader />
       <NumberOfResults />
       <InfiniteHits />
 
       <FilterButtonContainer>
-        <FilterButton />
+        <FilterButton setIsModalOpen={() => setIsModalOpen(true)} />
         <Spacer.BottomScreen />
       </FilterButtonContainer>
 
-      <VoidContainer>
-        <SearchFilter />
-      </VoidContainer>
+      <Filters
+        isModalOpen={isModalOpen}
+        // searchClient={searchClient}
+        // searchState={searchState}
+        toggleModal={() => setIsModalOpen(false)}
+        // onSearchStateChange={onSearchStateChange}
+      />
+
+      <VirtualRange attribute={FACETS_ENUM.OFFER_PRICE} />
     </Container>
+    // </AlgoliaWrapper>
   )
 }
+
+const VirtualRange = connectRange(() => null)
 
 const Container = styled.View({ flex: 1 })
 const VoidContainer = styled.View({ height: 0, width: 0, overflow: 'hidden' })
@@ -59,3 +82,5 @@ const NumberOfResults = connectStats(({ nbHits }) => {
   console.log('nbHits', nbHits)
   return <Typo.Body>{nbHits} results !</Typo.Body>
 })
+
+// export const Search = connectRange(SearchComponent)

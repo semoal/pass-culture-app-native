@@ -11,6 +11,7 @@ import './why-did-you-render'
 import { AuthWrapper } from 'features/auth/AuthContext'
 import { RootNavigator } from 'features/navigation/RootNavigator'
 import { AlgoliaWrapper } from 'features/search/pages/AlgoliaWrapper'
+import { SearchWrapper } from 'features/search/pages/SearchContext'
 import { env } from 'libs/environment'
 import { GeolocationWrapper } from 'libs/geolocation'
 import { i18n } from 'libs/i18n' //@translations
@@ -62,21 +63,23 @@ const AppComponent: FunctionComponent = function () {
   useHideSplashScreen()
 
   return (
-    <AlgoliaWrapper>
-      <QueryClientProvider client={queryClient}>
-        <GeolocationWrapper>
-          <AuthWrapper>
-            <I18nProvider language={i18n.language} i18n={i18n}>
-              <SafeAreaProvider>
-                <SnackBarProvider>
-                  <RootNavigator />
-                </SnackBarProvider>
-              </SafeAreaProvider>
-            </I18nProvider>
-          </AuthWrapper>
-        </GeolocationWrapper>
-      </QueryClientProvider>
-    </AlgoliaWrapper>
+    <QueryClientProvider client={queryClient}>
+      <SearchWrapper>
+        <AlgoliaWrapper>
+          <GeolocationWrapper>
+            <AuthWrapper>
+              <I18nProvider language={i18n.language} i18n={i18n}>
+                <SafeAreaProvider>
+                  <SnackBarProvider>
+                    <RootNavigator />
+                  </SnackBarProvider>
+                </SafeAreaProvider>
+              </I18nProvider>
+            </AuthWrapper>
+          </GeolocationWrapper>
+        </AlgoliaWrapper>
+      </SearchWrapper>
+    </QueryClientProvider>
   )
 }
 

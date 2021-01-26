@@ -25,9 +25,9 @@ interface Props {
   creditEvent?: number
 }
 interface ICTAWordingAndAction {
-  wording: string | undefined
+  isExternal?: boolean
+  wording?: string
   onPress?: () => void
-  shouldHideCTA?: boolean
 }
 
 // Follow logic of https://www.notion.so/Modalit-s-d-affichage-du-CTA-de-r-servation-dbd30de46c674f3f9ca9f37ce8333241
@@ -45,8 +45,10 @@ export const getCtaWordingAndAction = ({
   if (!isLoggedIn || !isBeneficiary) {
     const isEvent = category.categoryType === CategoryType.Event
     if (!externalTicketOfficeUrl) return { wording: undefined }
+
     return {
-      wording: isEvent ? _(t`Accéder à l'offre`) : _(t`Accéder à la billetterie externe`),
+      isExternal: !isEvent,
+      wording: isEvent ? _(t`Accéder à l'offre`) : _(t`Accéder à la billetterie`),
       onPress: () => openExternalUrl(externalTicketOfficeUrl),
     }
   }
@@ -60,7 +62,10 @@ export const getCtaWordingAndAction = ({
   if (category.categoryType === CategoryType.Thing) {
     // We check the platform first so that the user doesn't try to add funds and come back
     if (price > 0 && platform === 'ios') return { wording: _(t`Impossible de réserver`) }
-    if (price > creditThing) return { wording: _(t`Crédit insuffisant`) }
+    if (price > creditThing) {
+      if (offer.isDigital) return { wording: _(t`Crédit numérique insuffisant`) }
+      return { wording: _(t`Crédit insuffisant`) }
+    }
 
     return {
       wording: _(t`Réserver`),

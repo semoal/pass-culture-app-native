@@ -47,7 +47,7 @@ interface Route {
   withHocsWrapper?(component: ComponentType<any>): ComponentType<any>
 }
 
-function withRetryBoundaryWithNavigation(component: ComponentType<any>) {
+function withAsyncBoundary(component: ComponentType<any>) {
   return withErrorBoundary(React.memo(component), {
     FallbackComponent: AsyncErrorBoundary,
   })
@@ -62,7 +62,7 @@ function wrapRoute(route: Route) {
 }
 
 const routes: Array<Route> = [
-  { name: 'AcceptCgu', component: AcceptCgu },
+  { name: 'AcceptCgu', component: AcceptCgu, withHocsWrapper: withAsyncBoundary },
   { name: 'AccountCreated', component: AccountCreated },
   { name: 'AfterSignupEmailValidationBuffer', component: AfterSignupEmailValidationBuffer },
   { name: 'AppComponents', component: AppComponents },
@@ -73,7 +73,7 @@ const routes: Array<Route> = [
   { name: 'SearchCategories', component: SearchCategories },
   { name: 'LocationFilter', component: LocationFilter },
   { name: 'LocationPicker', component: LocationPicker },
-  { name: 'Login', component: Login, withHocsWrapper: withRetryBoundaryWithNavigation },
+  { name: 'Login', component: Login, withHocsWrapper: withAsyncBoundary },
   { name: 'Navigation', component: Navigation },
   { name: 'Offer', component: Offer },
   { name: 'OfferDescription', component: OfferDescription },

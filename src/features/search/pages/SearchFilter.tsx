@@ -3,8 +3,8 @@ import React from 'react'
 import { Dimensions } from 'react-native'
 import styled from 'styled-components/native'
 
+import { useUserProfileInfo } from 'features/home/api'
 import { ShowResults, ReinitializeFilters } from 'features/search/atoms/Buttons'
-import { LocationSection } from 'features/search/components'
 import { useSearch } from 'features/search/pages/SearchWrapper'
 import Section from 'features/search/sections'
 import { _ } from 'libs/i18n'
@@ -13,6 +13,8 @@ import { ColorsEnum, getSpacing, Spacer } from 'ui/theme'
 
 export const SearchFilter: React.FC = () => {
   const { searchState } = useSearch()
+  const { data: profile } = useUserProfileInfo()
+
   return (
     <React.Fragment>
       <React.Fragment>
@@ -21,7 +23,7 @@ export const SearchFilter: React.FC = () => {
           <Spacer.Column numberOfSpaces={16} />
 
           {/* Localisation */}
-          <LocationSection />
+          <Section.Location />
           <Separator marginVertical={getSpacing(6)} />
 
           {/* Rayon */}
@@ -49,8 +51,12 @@ export const SearchFilter: React.FC = () => {
           <Separator marginVertical={getSpacing(6)} />
 
           {/* Uniquement les offres duo */}
-          <Section.DuoOffer />
-          <Separator marginVertical={getSpacing(6)} />
+          {profile?.isBeneficiary && (
+            <React.Fragment>
+              <Section.DuoOffer />
+              <Separator marginVertical={getSpacing(6)} />
+            </React.Fragment>
+          )}
 
           {/* Uniquement les nouveautés */}
           <Section.NewOffer />

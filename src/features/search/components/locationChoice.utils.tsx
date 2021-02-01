@@ -1,32 +1,26 @@
 import { t } from '@lingui/macro'
 import React from 'react'
 
-import { LocationChoiceType } from 'features/search/locationChoice.types'
+import { useSearch } from 'features/search/pages/SearchWrapper'
+import { LocationType } from 'libs/algolia'
 import { _ } from 'libs/i18n'
+import { buildPlaceLabel } from 'libs/place'
 import { AroundMe } from 'ui/svg/icons/AroundMe'
+import { BicolorLocationPointer as Place } from 'ui/svg/icons/BicolorLocationPointer'
 import { Everywhere } from 'ui/svg/icons/Everywhere'
 import { BicolorIconInterface } from 'ui/svg/icons/types'
 
-export const getLocationChoiceName = (locationChoice: LocationChoiceType): string => {
-  switch (locationChoice) {
-    case LocationChoiceType.LOCALIZED:
-      return _(t`Autour de moi`)
-    case LocationChoiceType.EVERYWHERE:
-      return _(t`Partout`)
-    default:
-      return _(t`Partout`)
-  }
-}
+export const useLocationChoice = (
+  locationType: LocationType
+): { Icon: React.FC<BicolorIconInterface>; label: string; isSelected: boolean } => {
+  const { searchState } = useSearch()
+  const isSelected = locationType === searchState.locationType
 
-export const getLocationChoiceIcon = (
-  locationChoice: LocationChoiceType
-): React.FC<BicolorIconInterface> => {
-  switch (locationChoice) {
-    case LocationChoiceType.LOCALIZED:
-      return AroundMe
-    case LocationChoiceType.EVERYWHERE:
-      return Everywhere
-    default:
-      return AroundMe
-  }
+  if (locationType === LocationType.EVERYWHERE)
+    return { Icon: Everywhere, label: _(t`Partout`), isSelected }
+  if (locationType === LocationType.AROUND_ME)
+    return { Icon: AroundMe, label: _(t`Autour de moi`), isSelected }
+
+  const { place } = searchState
+  return { Icon: Place, label: place ? buildPlaceLabel(place) : _(t`Choisir un lieu`), isSelected }
 }

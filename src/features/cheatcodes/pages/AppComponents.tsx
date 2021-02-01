@@ -8,9 +8,11 @@ import styled from 'styled-components/native'
 import { CategoryNameEnum } from 'api/gen'
 import { UseNavigationType } from 'features/navigation/RootNavigator'
 import { AccordionItem, CallToAction } from 'features/offer/components'
-import { YoungerBadge } from 'features/profile/components/YoungerBadge'
+import { NonBeneficiaryHeader } from 'features/profile/components/NonBeneficiaryHeader'
+import { SectionRow } from 'features/profile/components/SectionRow'
 import { FilterSwitch } from 'features/search/atoms/FilterSwitch'
 import { SelectionLabel } from 'features/search/atoms/SelectionLabel'
+import { CATEGORY_CRITERIA } from 'libs/algolia/enums'
 import { mapCategoryToIcon } from 'libs/parsers'
 import { Banner, BannerType } from 'ui/components/Banner'
 import { CreditCeiling } from 'ui/components/bars/CreditCeiling'
@@ -39,6 +41,7 @@ import { ArrowNext } from 'ui/svg/icons/ArrowNext'
 import { ArrowPrevious } from 'ui/svg/icons/ArrowPrevious'
 import { BicolorBookings } from 'ui/svg/icons/BicolorBookings'
 import { BicolorFavorite } from 'ui/svg/icons/BicolorFavorite'
+import { BicolorLocationPointer } from 'ui/svg/icons/BicolorLocationPointer'
 import { BicolorLogo } from 'ui/svg/icons/BicolorLogo'
 import { BicolorProfile } from 'ui/svg/icons/BicolorProfile'
 import { BicolorSearch } from 'ui/svg/icons/BicolorSearch'
@@ -77,6 +80,7 @@ function onButtonPress() {
 }
 
 const NUMBER_OF_STEPS = 4
+const THIS_YEAR = new Date().getFullYear()
 
 export const AppComponents: FunctionComponent = () => {
   const {
@@ -89,6 +93,7 @@ export const AppComponents: FunctionComponent = () => {
   const [_partialDate, setPartialDate] = useState('')
   const [inputText, setInputText] = useState('')
   const [currentStep, setCurrentStep] = useState(1)
+  const [year, setYear] = useState(THIS_YEAR - 18)
 
   const onTriggerFakeLoading = useCallback(() => {
     setButtonIsLoading(true)
@@ -372,6 +377,10 @@ export const AppComponents: FunctionComponent = () => {
           <Everywhere size={24} />
           <Text> - Everywhere </Text>
         </AlignedText>
+        <AlignedText>
+          <BicolorLocationPointer size={24} />
+          <Text> - BicolorLocationPointer </Text>
+        </AlignedText>
       </AccordionItem>
 
       <Divider />
@@ -464,6 +473,64 @@ export const AppComponents: FunctionComponent = () => {
 
       <Divider />
 
+      {/* Profile components */}
+      <AccordionItem title="Profile components">
+        <GreyView>
+          <Spacer.Column numberOfSpaces={1} />
+          <Text> Progress bars </Text>
+          <Spacer.Column numberOfSpaces={3} />
+          <RowWrap>
+            <ProgressBar progress={0} color={ColorsEnum.GREEN_VALID} icon={Close} />
+            <ProgressBar progress={0.3} color={ColorsEnum.PRIMARY_DARK} icon={Close} />
+            <ProgressBar progress={1} color={ColorsEnum.SECONDARY} icon={Close} />
+          </RowWrap>
+          <Spacer.Column numberOfSpaces={1} />
+          <RowWrap>
+            <ProgressBar progress={0.5} color={ColorsEnum.PRIMARY} icon={Close} />
+            <ProgressBar progress={1} color={ColorsEnum.TERTIARY} icon={Close} />
+          </RowWrap>
+        </GreyView>
+        <Spacer.Column numberOfSpaces={2} />
+        <Text> Credit Ceiling (max=200) </Text>
+        <GreyView>
+          <Spacer.Column numberOfSpaces={2} />
+          <RowWrap>
+            <CreditCeiling amount={0} max={200} type={'all'} depositVersion={1} />
+            <CreditCeiling amount={155} max={200} type={'physical'} depositVersion={1} />
+            <CreditCeiling amount={200} max={200} type={'digital'} depositVersion={2} />
+          </RowWrap>
+        </GreyView>
+        <FlexView>
+          <Text>Section Row </Text>
+          <SectionRow
+            type="navigable"
+            title="navigable"
+            icon={Close}
+            onPress={() => Alert.alert('gooo !!!')}
+          />
+          <SectionRow type="clickable" title="with CTA" icon={Close} cta={<ExampleSwitch />} />
+          <SectionRow
+            type="clickable"
+            title="just clickable"
+            icon={Close}
+            onPress={() => Alert.alert('clicked')}
+          />
+        </FlexView>
+        <View>
+          <NonBeneficiaryHeader email="john@doe.com" dateOfBirth={`${year}-01-28T01:32:15`} />
+        </View>
+        <AlignedText>
+          <Text>Date de naissance: {year}-01-28</Text>
+        </AlignedText>
+        <AlignedText>
+          <Button title="-1 an" onPress={() => setYear((year) => year + 1)} />
+          <Spacer.Column numberOfSpaces={2} />
+          <Text>{THIS_YEAR - year} ans</Text>
+          <Spacer.Column numberOfSpaces={2} />
+          <Button title="+1 an" onPress={() => setYear((year) => year - 1)} />
+        </AlignedText>
+      </AccordionItem>
+
       {/* Your components */}
       <AccordionItem title="Your components">
         <AlignedText>
@@ -498,38 +565,7 @@ export const AppComponents: FunctionComponent = () => {
             onPress={() => setCurrentStep((step) => (step === NUMBER_OF_STEPS ? step : step + 1))}
           />
         </AlignedText>
-        <View>
-          <Spacer.Column numberOfSpaces={1} />
-          <Text> Progress bars </Text>
-          <Spacer.Column numberOfSpaces={3} />
-          <RowWrap>
-            <ProgressBar progress={0} color={ColorsEnum.GREEN_VALID} icon={Close} />
-            <ProgressBar progress={0.3} color={ColorsEnum.PRIMARY_DARK} icon={Close} />
-            <ProgressBar progress={1} color={ColorsEnum.SECONDARY} icon={Close} />
-          </RowWrap>
-          <Spacer.Column numberOfSpaces={1} />
-          <RowWrap>
-            <ProgressBar progress={0.5} color={ColorsEnum.PRIMARY} icon={Close} />
-            <ProgressBar progress={1} color={ColorsEnum.TERTIARY} icon={Close} />
-          </RowWrap>
-        </View>
-        <Spacer.Column numberOfSpaces={2} />
-        <Text> Credit Ceiling (max=200) </Text>
-        <View>
-          <Spacer.Column numberOfSpaces={2} />
-          <RowWrap>
-            <CreditCeiling amount={0} max={200} type={'all'} depositVersion={1} />
-            <CreditCeiling amount={155} max={200} type={'physical'} depositVersion={1} />
-            <CreditCeiling amount={200} max={200} type={'digital'} depositVersion={2} />
-          </RowWrap>
-        </View>
-        <View>
-          <Text>Badge trop jeune </Text>
-          <Spacer.Column numberOfSpaces={2} />
-          <YoungerBadge />
-        </View>
       </AccordionItem>
-
       <Spacer.Column numberOfSpaces={5} />
       <Spacer.BottomScreen />
     </StyledScrollView>
@@ -542,6 +578,12 @@ const AlignedText = styled(View)({
 })
 const Center = styled(View)({
   alignItems: 'center',
+})
+const GreyView = styled.View({
+  backgroundColor: ColorsEnum.GREY_LIGHT,
+})
+const FlexView = styled.View({
+  flex: 1,
 })
 
 const ColoredModalHeader = styled(ModalHeader).attrs({
@@ -574,12 +616,19 @@ const CategoryIcons = () => {
   return (
     <React.Fragment>
       <Text>{'Categories'}</Text>
-      {[...Object.keys(CategoryNameEnum), null].map((category: string | null) => {
+      {[...Object.values(CategoryNameEnum), null].map((category: string | null) => {
         const Icon = mapCategoryToIcon(category as CategoryNameEnum | null)
+        const BicolorIcon =
+          category && category in CATEGORY_CRITERIA
+            ? CATEGORY_CRITERIA[category as CategoryNameEnum].icon
+            : CATEGORY_CRITERIA['ALL'].icon
+
         return (
           <AlignedText key={category || "ŒUVRE D'ART"}>
             <Icon size={24} color={ColorsEnum.GREY_DARK} />
-            <Text> - {category || "ŒUVRE D'ART"} </Text>
+            <BicolorIcon size={24} color={ColorsEnum.PRIMARY} color2={ColorsEnum.PRIMARY} />
+            <BicolorIcon size={24} color={ColorsEnum.PRIMARY} color2={ColorsEnum.SECONDARY} />
+            <Text> - {category || "ŒUVRE D'ART / TOUTES"} </Text>
           </AlignedText>
         )
       })}

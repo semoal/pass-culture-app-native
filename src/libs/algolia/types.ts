@@ -1,14 +1,20 @@
 import { GeoCoordinates } from 'react-native-geolocation-service'
 
-import { Range } from '../typesUtils/typeHelpers'
+import { DATE_FILTER_OPTIONS } from 'libs/algolia/enums/filtersEnums'
+import { SuggestedPlace } from 'libs/place'
+import { Range } from 'libs/typesUtils/typeHelpers'
 
-import { DATE_FILTER_OPTIONS } from './enums/filtersEnums'
-
-type AlgoliaGeolocation = Pick<GeoCoordinates, 'longitude' | 'latitude'>
+export type AlgoliaGeolocation = Pick<GeoCoordinates, 'longitude' | 'latitude'>
 
 interface AlgoliaDate {
   option: DATE_FILTER_OPTIONS
   selectedDate: Date
+}
+
+export enum LocationType {
+  AROUND_ME = 'AROUND_ME',
+  EVERYWHERE = 'EVERYWHERE',
+  PLACE = 'PLACE',
 }
 
 /**
@@ -34,8 +40,9 @@ export interface ParsedAlgoliaParameters {
   beginningDatetime: Date | null
   endingDatetime: Date | null
   priceRange: Range<number> | null
-  searchAround: boolean
+  locationType: LocationType
   geolocation: AlgoliaGeolocation | null
+  place?: SuggestedPlace | null
 }
 
 export interface ExtraAlgoliaParameters {

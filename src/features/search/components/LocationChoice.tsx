@@ -1,37 +1,44 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { View } from 'react-native'
 import styled from 'styled-components/native'
 
-import {
-  getLocationChoiceName,
-  getLocationChoiceIcon,
-} from 'features/search/components/locationChoice.utils'
-import { LocationChoiceType } from 'features/search/locationChoice.types'
+import { useLocationChoice } from 'features/search/components/locationChoice.utils'
+import { LocationType } from 'libs/algolia'
+import { ArrowNext } from 'ui/svg/icons/ArrowNext'
 import { Validate } from 'ui/svg/icons/Validate'
 import { getSpacing, Spacer, Typo, ColorsEnum } from 'ui/theme'
 import { ACTIVE_OPACITY } from 'ui/theme/colors'
 
 type Props = {
-  type: LocationChoiceType
+  locationType: LocationType
+  testID: string
+  onPress?: () => void
+  arrowNext?: boolean
 }
 
-export const LocationChoice: React.FC<Props> = ({ type }) => {
-  const [isSelected, setIsSelected] = useState<boolean>(false)
+export const LocationChoice: React.FC<Props> = (props) => {
+  const { locationType, onPress, arrowNext = false, testID } = props
+  const { Icon, label, isSelected } = useLocationChoice(locationType)
   const iconColor2 = isSelected ? ColorsEnum.PRIMARY : ColorsEnum.SECONDARY
-  const LocationChoiceIcon = getLocationChoiceIcon(type)
+
   return (
-    <Container onPress={() => setIsSelected(!isSelected)}>
+    <Container onPress={onPress} testID={`locationChoice-${testID}`}>
       <FirstPart>
-        <LocationChoiceIcon size={48} color2={iconColor2} />
+        <Icon size={48} color2={iconColor2} />
         <Spacer.Row numberOfSpaces={2} />
         <Typo.ButtonText color={isSelected ? ColorsEnum.PRIMARY : ColorsEnum.BLACK}>
-          {getLocationChoiceName(type)}
+          {label}
         </Typo.ButtonText>
       </FirstPart>
-      {isSelected && (
-        <IconContainer>
-          <Validate color={ColorsEnum.PRIMARY} />
-        </IconContainer>
+      <Spacer.Flex />
+      {isSelected && <Validate color={ColorsEnum.PRIMARY} testID="validateIcon" />}
+      {arrowNext ? (
+        <React.Fragment>
+          <Spacer.Row numberOfSpaces={2} />
+          <ArrowNext />
+        </React.Fragment>
+      ) : (
+        <Spacer.Row numberOfSpaces={10} />
       )}
     </Container>
   )
@@ -50,8 +57,4 @@ const Container = styled.TouchableOpacity.attrs(() => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   marginHorizontal: getSpacing(6),
-})
-
-const IconContainer = styled.View({
-  paddingRight: getSpacing(10),
 })

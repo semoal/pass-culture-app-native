@@ -1,12 +1,20 @@
 import mockdate from 'mockdate'
 
+import { LocationType } from 'libs/algolia'
 import { DATE_FILTER_OPTIONS } from 'libs/algolia/enums'
+import { SuggestedPlace } from 'libs/place'
 
 import { Action, initialSearchState, searchReducer, SearchState } from '../reducer'
 import { MAX_PRICE } from '../reducer.helpers'
 
 const Today = new Date(2020, 10, 1)
 const Tomorrow = new Date(2020, 10, 2)
+
+const Kourou: SuggestedPlace = {
+  name: { long: 'Kourou', short: 'Kourou' },
+  extraData: { city: 'Kourou', department: 'Guyane' },
+  geolocation: { longitude: -52.669736, latitude: 5.16186 },
+}
 
 describe('Search reducer', () => {
   beforeAll(() => {
@@ -71,17 +79,17 @@ describe('Search reducer', () => {
     })
   })
 
-  it('should handle CATEGORIES', () => {
+  it('should handle TOGGLE_CATEGORY', () => {
     // 1. Add JEUX_VIDEO
-    let newState = searchReducer(state, { type: 'CATEGORIES', payload: 'JEUX_VIDEO' })
+    let newState = searchReducer(state, { type: 'TOGGLE_CATEGORY', payload: 'JEUX_VIDEO' })
     expect(newState).toStrictEqual({ ...state, offerCategories: ['JEUX_VIDEO'] })
 
     // 2. Add CINEMA
-    newState = searchReducer(newState, { type: 'CATEGORIES', payload: 'CINEMA' })
+    newState = searchReducer(newState, { type: 'TOGGLE_CATEGORY', payload: 'CINEMA' })
     expect(newState).toStrictEqual({ ...state, offerCategories: ['JEUX_VIDEO', 'CINEMA'] })
 
     // 3. Remove JEUX_VIDEO
-    newState = searchReducer(newState, { type: 'CATEGORIES', payload: 'JEUX_VIDEO' })
+    newState = searchReducer(newState, { type: 'TOGGLE_CATEGORY', payload: 'JEUX_VIDEO' })
     expect(newState).toStrictEqual({ ...state, offerCategories: ['CINEMA'] })
   })
 
@@ -178,5 +186,43 @@ describe('Search reducer', () => {
     newState = searchReducer(newState, { type: 'TOGGLE_DATE' })
     newState = searchReducer(newState, { type: 'SELECT_DATE', payload: Tomorrow })
     expect(newState.date?.selectedDate).toStrictEqual(Tomorrow)
+  })
+
+  it('should handle SET_CATEGORY', () => {
+    const action: Action = { type: 'SET_CATEGORY', payload: ['JEUX_VIDEO'] }
+    let newState = searchReducer(state, action)
+    expect(newState.offerCategories).toStrictEqual(['JEUX_VIDEO'])
+
+    newState = searchReducer(newState, { type: 'SET_CATEGORY', payload: [] })
+    expect(newState.offerCategories).toStrictEqual([])
+  })
+  it('should handle LOCATION_AROUND_ME', () => {
+    const newState = searchReducer(state, {
+      type: 'LOCATION_AROUND_ME',
+      payload: { latitude: 48.8557, longitude: 2.3469 },
+    })
+    expect(newState.locationType).toEqual(LocationType.AROUND_ME)
+    expect(newState.geolocation).toEqual({ latitude: 48.8557, longitude: 2.3469 })
+    expect(newState.place).toBeNull()
+  })
+  it('should handle LOCATION_EVERYWHERE', () => {
+    const newState = searchReducer(
+      {
+        ...state,
+        geolocation: { latitude: 48.8557, longitude: 2.3469 },
+        locationType: LocationType.PLACE,
+        place: Kourou,
+      },
+      { type: 'LOCATION_EVERYWHERE' }
+    )
+    expect(newState.locationType).toEqual(LocationType.EVERYWHERE)
+    expect(newState.geolocation).toBeNull()
+    expect(newState.place).toBeNull()
+  })
+  it('should handle LOCATION_PLACE', () => {
+    const newState = searchReducer(state, { type: 'LOCATION_PLACE', payload: Kourou })
+    expect(newState.locationType).toEqual(LocationType.PLACE)
+    expect(newState.geolocation).toEqual(Kourou.geolocation)
+    expect(newState.place).toStrictEqual(Kourou)
   })
 })

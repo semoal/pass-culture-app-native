@@ -24,7 +24,9 @@ import { CheatCodes } from 'features/cheatcodes/pages/CheatCodes'
 import { Navigation } from 'features/cheatcodes/pages/Navigation'
 import { RetryBoundaryWithNavigation } from 'features/errors'
 import { Offer, OfferDescription } from 'features/offer'
+import { Categories as SearchCategories } from 'features/search/pages/Categories'
 import { LocationFilter } from 'features/search/pages/LocationFilter'
+import { LocationPicker } from 'features/search/pages/LocationPicker'
 import { SearchFilter } from 'features/search/pages/SearchFilter'
 import { analytics } from 'libs/analytics'
 import { ColorsEnum } from 'ui/theme'
@@ -52,7 +54,9 @@ const routes: Array<Route> = [
   { name: 'EligibilityConfirmed', component: EligibilityConfirmed },
   { name: 'ForgottenPassword', component: ForgottenPassword },
   { name: 'IdCheck', component: IdCheck },
+  { name: 'SearchCategories', component: SearchCategories },
   { name: 'LocationFilter', component: LocationFilter },
+  { name: 'LocationPicker', component: LocationPicker },
   { name: 'Login', component: Login },
   { name: 'Navigation', component: Navigation },
   { name: 'Offer', component: Offer },

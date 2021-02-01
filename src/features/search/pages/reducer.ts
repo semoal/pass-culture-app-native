@@ -1,5 +1,6 @@
-import { FetchAlgoliaParameters } from 'libs/algolia'
+import { FetchAlgoliaParameters, LocationType, AlgoliaGeolocation } from 'libs/algolia'
 import { DATE_FILTER_OPTIONS } from 'libs/algolia/enums'
+import { SuggestedPlace } from 'libs/place'
 
 import { clampPrice, addOrRemove } from './reducer.helpers'
 
@@ -24,11 +25,12 @@ export const initialSearchState: SearchState = {
   beginningDatetime: null,
   endingDatetime: null,
   priceRange: null,
-  searchAround: false,
+  locationType: LocationType.EVERYWHERE,
   geolocation: null,
   date: null,
   timeRange: null,
   showResults: false,
+  place: null,
 }
 
 export const DEFAULT_TIME_RANGE = [8, 24]
@@ -38,9 +40,10 @@ export type Action =
   | { type: 'INIT_FROM_SEE_MORE'; payload: Partial<SearchState> }
   | { type: 'PRICE_RANGE'; payload: SearchState['priceRange'] }
   | { type: 'TIME_RANGE'; payload: SearchState['timeRange'] }
-  | { type: 'CATEGORIES'; payload: string }
   | { type: 'OFFER_TYPE'; payload: keyof SearchState['offerTypes'] }
   | { type: 'SHOW_RESULTS'; payload: boolean }
+  | { type: 'SET_CATEGORY'; payload: SearchState['offerCategories'] }
+  | { type: 'TOGGLE_CATEGORY'; payload: string }
   | { type: 'TOGGLE_OFFER_FREE' }
   | { type: 'TOGGLE_OFFER_DUO' }
   | { type: 'TOGGLE_OFFER_NEW' }
@@ -48,6 +51,9 @@ export type Action =
   | { type: 'TOGGLE_HOUR' }
   | { type: 'SELECT_DATE_FILTER_OPTION'; payload: DATE_FILTER_OPTIONS }
   | { type: 'SELECT_DATE'; payload: Date }
+  | { type: 'LOCATION_AROUND_ME'; payload: AlgoliaGeolocation }
+  | { type: 'LOCATION_EVERYWHERE' }
+  | { type: 'LOCATION_PLACE'; payload: SuggestedPlace }
 
 export const searchReducer = (state: SearchState, action: Action): SearchState => {
   switch (action.type) {
@@ -65,11 +71,13 @@ export const searchReducer = (state: SearchState, action: Action): SearchState =
       return { ...state, priceRange: action.payload }
     case 'TIME_RANGE':
       return { ...state, timeRange: action.payload }
-    case 'CATEGORIES':
+    case 'TOGGLE_CATEGORY':
       return {
         ...state,
         offerCategories: addOrRemove(state.offerCategories, action.payload),
       }
+    case 'SET_CATEGORY':
+      return { ...state, offerCategories: action.payload }
     case 'OFFER_TYPE':
       return {
         ...state,
@@ -102,6 +110,27 @@ export const searchReducer = (state: SearchState, action: Action): SearchState =
     case 'SELECT_DATE':
       if (!state.date) return state
       return { ...state, date: { ...state.date, selectedDate: action.payload } }
+    case 'LOCATION_AROUND_ME':
+      return {
+        ...state,
+        locationType: LocationType.AROUND_ME,
+        geolocation: action.payload,
+        place: null,
+      }
+    case 'LOCATION_EVERYWHERE':
+      return {
+        ...state,
+        locationType: LocationType.EVERYWHERE,
+        geolocation: null,
+        place: null,
+      }
+    case 'LOCATION_PLACE':
+      return {
+        ...state,
+        locationType: LocationType.PLACE,
+        geolocation: action.payload.geolocation,
+        place: action.payload,
+      }
     default:
       return state
   }

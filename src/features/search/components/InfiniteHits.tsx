@@ -12,9 +12,15 @@ interface Props {
   hits: AlgoliaHit[]
   hasMore: boolean
   refineNext: () => void
+  handleIsScrolling: (value: boolean) => () => void
 }
 
-export const InfiniteHitsComponent: React.FC<Props> = ({ hits, hasMore, refineNext }) => (
+export const InfiniteHitsComponent: React.FC<Props> = ({
+  hits,
+  hasMore,
+  refineNext,
+  handleIsScrolling,
+}) => (
   <Container>
     <FlatList
       data={hits}
@@ -24,6 +30,8 @@ export const InfiniteHitsComponent: React.FC<Props> = ({ hits, hasMore, refineNe
       ItemSeparatorComponent={Separator}
       renderItem={({ item: hit }) => <Hit hit={hit} />}
       onEndReached={() => hasMore && refineNext()}
+      onScrollEndDrag={handleIsScrolling(false)}
+      onScrollBeginDrag={handleIsScrolling(true)}
     />
   </Container>
 )

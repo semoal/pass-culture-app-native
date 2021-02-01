@@ -5,7 +5,7 @@ import { SearchParameters } from 'features/search/pages/reducer'
 import { RADIUS_FILTERS } from 'libs/algolia/enums'
 import { buildFacetFilters } from 'libs/algolia/fetchAlgolia/fetchAlgolia.facetFilters'
 import { buildNumericFilters } from 'libs/algolia/fetchAlgolia/fetchAlgolia.numericFilters'
-import { FetchAlgoliaParameters } from 'libs/algolia/types'
+import { FetchAlgoliaParameters, LocationType } from 'libs/algolia/types'
 import { env } from 'libs/environment'
 
 const client = algoliasearch(env.ALGOLIA_APPLICATION_ID, env.ALGOLIA_SEARCH_API_KEY)
@@ -26,7 +26,7 @@ export const buildSearchParameters = ({
     isThing: false,
   },
   priceRange = null,
-  searchAround = false,
+  locationType = LocationType.EVERYWHERE,
   timeRange = null,
   tags = [],
 }: SearchParameters) => ({
@@ -40,7 +40,7 @@ export const buildSearchParameters = ({
     priceRange,
     timeRange,
   }),
-  ...buildGeolocationParameter({ aroundRadius, geolocation, searchAround }),
+  ...buildGeolocationParameter({ aroundRadius, geolocation, locationType }),
 })
 
 export const fetchAlgolia = <T>({
@@ -62,8 +62,8 @@ const buildHitsPerPage = (hitsPerPage: FetchAlgoliaParameters['hitsPerPage']) =>
 const buildGeolocationParameter = ({
   aroundRadius,
   geolocation,
-  searchAround,
-}: Pick<FetchAlgoliaParameters, 'aroundRadius' | 'geolocation' | 'searchAround'>):
+  locationType,
+}: Pick<FetchAlgoliaParameters, 'aroundRadius' | 'geolocation' | 'locationType'>):
   | {
       aroundLatLng: string
       aroundRadius: 'all' | number
@@ -72,21 +72,24 @@ const buildGeolocationParameter = ({
   if (geolocation) {
     const { longitude, latitude } = geolocation
     if (latitude && longitude) {
-      const aroundRadiusInMeters = computeRadiusInMeters(aroundRadius, searchAround)
+      const aroundRadiusInMeters = computeRadiusInMeters(aroundRadius, locationType)
       const radiusIsPositive = aroundRadiusInMeters > 0
 
       return {
         aroundLatLng: `${latitude}, ${longitude}`,
         aroundRadius:
-          searchAround && radiusIsPositive ? aroundRadiusInMeters : RADIUS_FILTERS.UNLIMITED_RADIUS,
+          locationType !== LocationType.EVERYWHERE && radiusIsPositive
+            ? aroundRadiusInMeters
+            : RADIUS_FILTERS.UNLIMITED_RADIUS,
       }
     }
   }
   return undefined
 }
 
-const computeRadiusInMeters = (aroundRadius: number | null, searchAround: boolean): number => {
-  if (searchAround && aroundRadius === 0) return RADIUS_FILTERS.RADIUS_IN_METERS_FOR_NO_OFFERS
+const computeRadiusInMeters = (aroundRadius: number | null, locationType: LocationType): number => {
+  if (locationType !== LocationType.EVERYWHERE && aroundRadius === 0)
+    return RADIUS_FILTERS.RADIUS_IN_METERS_FOR_NO_OFFERS
   if (aroundRadius === null) return -1
   return aroundRadius * 1000
 }

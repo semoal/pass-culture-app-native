@@ -1,6 +1,6 @@
 import { NavigationContainer, Theme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import React, { useEffect, useMemo } from 'react'
+import React, { ComponentType, useEffect, useMemo } from 'react'
 import { withErrorBoundary } from 'react-error-boundary'
 
 import { ForgottenPassword } from 'features/auth/forgottenPassword/ForgottenPassword'
@@ -22,7 +22,7 @@ import { VerifyEligibility } from 'features/auth/signup/VerifyEligibility'
 import { AppComponents } from 'features/cheatcodes/pages/AppComponents'
 import { CheatCodes } from 'features/cheatcodes/pages/CheatCodes'
 import { Navigation } from 'features/cheatcodes/pages/Navigation'
-import { RetryBoundaryWithNavigation } from 'features/errors'
+import { AsyncErrorBoundary } from 'features/errors'
 import { Offer, OfferDescription } from 'features/offer'
 import { Categories as SearchCategories } from 'features/search/pages/Categories'
 import { LocationFilter } from 'features/search/pages/LocationFilter'
@@ -42,9 +42,25 @@ export const RootStack = createStackNavigator<RootStackParamList>()
 const theme = { colors: { background: ColorsEnum.WHITE } } as Theme
 
 interface Route {
-  name: any
-  component: any
+  name: keyof RootStackParamList
+  component: ComponentType<any>
+  withHocsWrapper?(component: ComponentType<any>): ComponentType<any>
 }
+
+function withRetryBoundaryWithNavigation(component: ComponentType<any>) {
+  return withErrorBoundary(React.memo(component), {
+    FallbackComponent: AsyncErrorBoundary,
+  })
+}
+
+function wrapRoute(route: Route) {
+  if (route.withHocsWrapper) {
+    route.component = route.withHocsWrapper(route.component)
+  }
+
+  return route
+}
+
 const routes: Array<Route> = [
   { name: 'AcceptCgu', component: AcceptCgu },
   { name: 'AccountCreated', component: AccountCreated },
@@ -57,7 +73,7 @@ const routes: Array<Route> = [
   { name: 'SearchCategories', component: SearchCategories },
   { name: 'LocationFilter', component: LocationFilter },
   { name: 'LocationPicker', component: LocationPicker },
-  { name: 'Login', component: Login },
+  { name: 'Login', component: Login, withHocsWrapper: withRetryBoundaryWithNavigation },
   { name: 'Navigation', component: Navigation },
   { name: 'Offer', component: Offer },
   { name: 'OfferDescription', component: OfferDescription },
@@ -81,12 +97,11 @@ export const RootNavigator: React.FC = () => {
 
   const screens = useMemo(
     () =>
-      routes.map((route) => {
-        const WrappedComponent = withErrorBoundary(React.memo(route.component), {
-          FallbackComponent: RetryBoundaryWithNavigation,
-        })
-        return <RootStack.Screen key={route.name} name={route.name} component={WrappedComponent} />
-      }),
+      routes
+        .map(wrapRoute)
+        .map((route) => (
+          <RootStack.Screen key={route.name} name={route.name} component={route.component} />
+        )),
     [routes]
   )
   return (

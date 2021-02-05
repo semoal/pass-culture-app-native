@@ -29,7 +29,7 @@ export const SearchFilter: React.FC = () => {
   return (
     <React.Fragment>
       <React.Fragment>
-        <StyledScrollView ref={scrollViewRef}>
+        <Container ref={scrollViewRef as any}>
           <Spacer.TopScreen />
           <Spacer.Column numberOfSpaces={16} />
 
@@ -103,7 +103,7 @@ export const SearchFilter: React.FC = () => {
           )}
 
           <Spacer.Column numberOfSpaces={30} />
-        </StyledScrollView>
+        </Container>
       </React.Fragment>
 
       <PageHeader title={_(t`Filtrer`)} RightComponent={ReinitializeFilters} />
@@ -117,7 +117,7 @@ export const SearchFilter: React.FC = () => {
 }
 
 const { width } = Dimensions.get('window')
-const StyledScrollView = styled(ScrollView)({ flex: 1 })
+const Container = styled.ScrollView({ flex: 1 })
 const Separator = styled.View<{ marginVertical?: number }>(({ marginVertical = 0 }) => ({
   width: width - getSpacing(2 * 6),
   height: 2,

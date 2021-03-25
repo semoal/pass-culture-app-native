@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useRef } from 'react'
-import { Modal, ScrollView, TouchableOpacity, View } from 'react-native'
+import { ScrollView, TouchableOpacity, View } from 'react-native'
+import Modal from 'react-native-modal'
 import styled from 'styled-components/native'
 
 import { ModalOverlay } from 'ui/components/modals/ModalOverlay'
@@ -33,44 +34,44 @@ export const AppModal: FunctionComponent<Props> = ({
 }) => {
   const { bottom } = useCustomSafeInsets()
   const scrollViewRef = useRef<ScrollView | null>(null)
+  if (visible) {
+    console.log('isScrollable', isScrollable, title)
+  }
 
   return (
     <React.Fragment>
       <ModalOverlay visible={visible} />
       <Modal
-        animationType="slide"
         statusBarTranslucent
-        transparent={true}
-        visible={visible}
-        testID="modal">
-        <ClicAwayArea activeOpacity={1} onPress={onRightIconPress}>
-          <Container activeOpacity={1}>
-            <ModalHeader
-              title={title}
-              leftIcon={leftIcon}
-              onLeftIconPress={onLeftIconPress}
-              rightIcon={rightIcon}
-              onRightIconPress={onRightIconPress}
-              numberOfLines={titleNumberOfLines}
-            />
-
-            <Content style={{ paddingBottom: bottom }}>
-              {isScrollable ? (
-                <StyledScrollView
-                  ref={scrollViewRef}
-                  showsVerticalScrollIndicator={false}
-                  onContentSizeChange={() =>
-                    scrollViewRef.current !== null && scrollViewRef.current.scrollTo({ y: 0 })
-                  }
-                  contentContainerStyle={{ paddingVertical: getSpacing(2) }}>
-                  <View onStartShouldSetResponder={() => true}>{children}</View>
-                </StyledScrollView>
-              ) : (
-                children
-              )}
-            </Content>
-          </Container>
-        </ClicAwayArea>
+        isVisible={visible}
+        testID="modal"
+        propagateSwipe={true}
+        hasBackdrop={true}
+        swipeDirection="left"
+        onSwipeStart={() => console.log('onSwipeStart')}
+        swipeThreshold={1}>
+        {/* <ClicAwayArea activeOpacity={1} onPress={onRightIconPress}>
+          <Container activeOpacity={1}> */}
+        <ModalHeader
+          title={title}
+          leftIcon={leftIcon}
+          onLeftIconPress={onLeftIconPress}
+          rightIcon={rightIcon}
+          onRightIconPress={onRightIconPress}
+          numberOfLines={titleNumberOfLines}
+        />
+        {/* <Content style={{ paddingBottom: bottom }}> */}
+        <StyledScrollView
+          ref={scrollViewRef}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() =>
+            scrollViewRef.current !== null && scrollViewRef.current.scrollTo({ y: 0 })
+          }>
+          <View onStartShouldSetResponder={() => true}>{children}</View>
+        </StyledScrollView>
+        {/* </Content> */}
+        {/* </Container>
+        </ClicAwayArea> */}
       </Modal>
     </React.Fragment>
   )

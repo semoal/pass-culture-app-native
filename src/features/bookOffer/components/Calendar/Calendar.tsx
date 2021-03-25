@@ -1,11 +1,13 @@
-import React from 'react'
-import { View } from 'react-native'
+import React, { useRef } from 'react'
+import { Modal, View, ScrollView, TouchableOpacity } from 'react-native'
 import { Calendar as RNCalendar, CalendarTheme, LocaleConfig } from 'react-native-calendars'
+import GestureRecognizer from 'react-native-swipe-gestures'
 import styled from 'styled-components/native'
 
 import { OfferStockResponse } from 'api/gen'
 import { OfferStatus } from 'features/bookOffer/services/utils'
 import { formatToFrenchDecimal } from 'libs/parsers'
+import { ModalOverlay } from 'ui/components/modals/ModalOverlay'
 import { ArrowNext } from 'ui/svg/icons/ArrowNext'
 import { ArrowPrevious } from 'ui/svg/icons/ArrowPrevious'
 import { ColorsEnum, getSpacing, Spacer, Typo } from 'ui/theme'
@@ -45,7 +47,7 @@ interface Props {
   userRemainingCredit: number | null
 }
 
-export const Calendar: React.FC<Props> = ({ stocks, userRemainingCredit }) => {
+export const CalendarED: React.FC<Props> = ({ stocks = [], userRemainingCredit }) => {
   const markedDates = useMarkedDates(stocks, userRemainingCredit || 0)
 
   return (
@@ -80,4 +82,128 @@ export const Calendar: React.FC<Props> = ({ stocks, userRemainingCredit }) => {
   )
 }
 
+export const Calendar = () => {
+  const calendarRef = useRef(null)
+  const markedDates = {}
+
+  return (
+    <GestureRecognizer
+      onSwipe={(gestureName, gestureState) => {
+        console.log('gestureName', gestureName)
+        const { dx } = gestureState
+        if (dx > 20) {
+          calendarRef.current.addMonth(-1)
+        } else if (dx < 20) {
+          calendarRef.current.addMonth(1)
+        }
+      }}>
+      <RNCalendar
+        ref={calendarRef}
+        firstDay={1}
+        enableSwipeMonths={true}
+        renderHeader={(date) => <MonthHeader date={date} />}
+        hideExtraDays={true}
+        renderArrow={renderArrow}
+        theme={calendarHeaderStyle}
+        markedDates={markedDates}
+        dayComponent={({ date, marking = defaultMarking }) => {
+          // problem in the definition of marking in the library:
+          // see https://www.uglydirtylittlestrawberry.co.uk/posts/wix-react-native-calendar-challenges/
+          const { price, status, selected } = (marking as unknown) as Marking
+
+          return (
+            <StyledView>
+              <DayComponent status={status} selected={selected} date={date} />
+              {typeof price === 'number' ? (
+                <Typo.Caption
+                  color={
+                    status === OfferStatus.BOOKABLE ? ColorsEnum.PRIMARY : ColorsEnum.GREY_DARK
+                  }>
+                  {formatToFrenchDecimal(price).replace(' ', '')}
+                </Typo.Caption>
+              ) : (
+                <Spacer.Column numberOfSpaces={getSpacing(1)} />
+              )}
+            </StyledView>
+          )
+        }}
+      />
+    </GestureRecognizer>
+  )
+}
+
 const StyledView = styled(View)({ alignItems: 'center' })
+
+export const CalendarE = () => {
+  const scrollViewRef = useRef<ScrollView | null>(null)
+  const visible = true
+
+  return (
+    <React.Fragment>
+      <ModalOverlay visible={visible} />
+      <Modal
+        animationType="slide"
+        statusBarTranslucent
+        transparent={true}
+        visible={visible}
+        testID="modal">
+        <GestureRecognizer
+          onSwipe={(gestureName, gestureState) => {
+            console.log('gestureName', gestureName)
+            const { dx } = gestureState
+            if (dx > 20) {
+              //   calendarRef.current.addMonth(-1)
+              // } else if (dx < 20) {
+              //   calendarRef.current.addMonth(1)
+            }
+          }}>
+          <ClicAwayArea activeOpacity={1}>
+            <Container activeOpacity={1}>
+              <Content>
+                <StyledScrollView
+                  ref={scrollViewRef}
+                  showsVerticalScrollIndicator={false}
+                  onContentSizeChange={() =>
+                    scrollViewRef.current !== null && scrollViewRef.current.scrollTo({ y: 0 })
+                  }>
+                  <View onStartShouldSetResponder={() => true}>
+                    <Calendar />
+                  </View>
+                </StyledScrollView>
+              </Content>
+            </Container>
+          </ClicAwayArea>
+        </GestureRecognizer>
+      </Modal>
+    </React.Fragment>
+  )
+}
+
+const ClicAwayArea = styled(TouchableOpacity)({
+  flexGrow: 1,
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
+  height: '100%',
+  width: '100%',
+})
+
+const Container = styled(TouchableOpacity)({
+  flexDirection: 'column',
+  backgroundColor: ColorsEnum.WHITE,
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  width: '100%',
+  maxHeight: '85%',
+  borderTopStartRadius: getSpacing(4),
+  borderTopEndRadius: getSpacing(4),
+  padding: getSpacing(5),
+})
+
+const Content = styled.View({
+  paddingTop: getSpacing(5),
+  width: '100%',
+  alignItems: 'center',
+  maxWidth: getSpacing(125),
+})
+
+const StyledScrollView = styled(ScrollView)({ width: '100%' })

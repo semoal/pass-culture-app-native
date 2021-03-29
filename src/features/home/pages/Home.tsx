@@ -105,7 +105,7 @@ export const Home: FunctionComponent = function () {
         <Spacer.Column numberOfSpaces={2} />
         <Typo.Body color={ColorsEnum.WHITE}>{subtitle}</Typo.Body>
       </CenterContainer>
-      <Spacer.Column numberOfSpaces={6} />
+      <Spacer.Column numberOfSpaces={20} />
 
       {showSkeleton ? <HomeBodyPlaceholder /> : null}
       <HomeBodyLoadingContainer isLoading={showSkeleton}>

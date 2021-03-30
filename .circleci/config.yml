@@ -309,7 +309,10 @@ workflows:
   version: 2.1
   commit:
     jobs:
-      - run-tests
+      - run-tests:
+          filters:
+            tags:
+              only: /.*/
       - deploy-soft-testing:
           filters:
             branches:
@@ -334,7 +337,7 @@ workflows:
       - deploy-android-staging-hard:
           filters:
             tags:
-              only: /^v.*/
+              only: /^test.*/
             branches:
               ignore: /.*/
           requires:

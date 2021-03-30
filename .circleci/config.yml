@@ -334,9 +334,7 @@ workflows:
       - deploy-android-staging-hard:
           filters:
             tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+              only: /^test.*/
           requires:
             - run-tests
       - deploy-ios-staging-hard:

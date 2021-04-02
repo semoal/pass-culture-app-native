@@ -77,7 +77,7 @@ describe('SetBirthday Page', () => {
     const buttonContainer = renderAPI.getByTestId('button-container-validate-birthday')
     expect(buttonContainer.props.style.backgroundColor).toEqual(ColorsEnum.PRIMARY)
     expect(renderAPI.queryByText('La date choisie est incorrecte')).toBeFalsy()
-    expect(navigate).toBeCalledWith('AcceptCgu', {
+    expect(navigate).toBeCalledWith('SetPostalCode', {
       birthday: '1995-01-16',
       email: 'john.doe@example.com',
       isNewsletterChecked: true,
@@ -95,10 +95,10 @@ describe('SetBirthday Page', () => {
     expect(birthdayModal.props.visible).toBeTruthy()
   })
 
-  it('should display 4 step dots with the third one as current step', () => {
+  it('should display 5 step dots with the third one as current step', () => {
     const { getAllByTestId } = renderSetBirthday()
     const dots = getAllByTestId('dot-icon')
-    expect(dots.length).toBe(4)
+    expect(dots.length).toBe(5)
     expect(dots[2].props.fill).toEqual(ColorsEnum.PRIMARY)
   })
 

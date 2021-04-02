@@ -20,6 +20,7 @@ export type RootStackParamList = {
     isNewsletterChecked: boolean
     password: string
     birthday: string
+    postalCode: string
   }
   AccountCreated: undefined
   AfterSignupEmailValidationBuffer: { token: string; expirationTimestamp: number; email: string }
@@ -66,6 +67,7 @@ export type RootStackParamList = {
     | ({ preventCancellation?: boolean } & BackNavigationParams<'Offer'>)
     | undefined
   SetPassword: { email: string; isNewsletterChecked: boolean }
+  SetPostalCode: { email: string; isNewsletterChecked: boolean; password: string; birthday: string }
   SignupConfirmationEmailSent: { email: string }
   SignupConfirmationExpiredLink: { email: string }
   TabNavigator: {

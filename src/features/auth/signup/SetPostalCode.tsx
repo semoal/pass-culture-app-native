@@ -1,5 +1,5 @@
 import { t } from '@lingui/macro'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useNavigationState } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { FunctionComponent, useRef, useState } from 'react'
 import { TextInput as RNTextInput } from 'react-native'
@@ -26,18 +26,19 @@ export const SetPostalCode: FunctionComponent<Props> = ({ route }) => {
   const [hasError, setHasError] = useState(false)
 
   const { navigate, goBack } = useNavigation<UseNavigationType>()
-  const email = route.params.email
-  const isNewsletterChecked = route.params.isNewsletterChecked
-  const password = route.params.password
-  const birthday = route.params.birthday
-
   const postalCodeInput = useRef<RNTextInput | null>(null)
+  useNavigationState((state) => state.routes.forEach((route) => console.log(route)))
 
   const {
     visible: fullPageModalVisible,
     showModal: showFullPageModal,
     hideModal: hideFullPageModal,
   } = useModal(false)
+
+  const email = route.params.email
+  const isNewsletterChecked = route.params.isNewsletterChecked
+  const password = route.params.password
+  const birthday = route.params.birthday
 
   const isPostalCodeCorrect = postalCode.length === 5 ? true : false
 
@@ -49,6 +50,7 @@ export const SetPostalCode: FunctionComponent<Props> = ({ route }) => {
   }
 
   function goToCguAcceptance() {
+    console.log('navigue')
     navigate('AcceptCgu', { email, isNewsletterChecked, password, birthday, postalCode })
   }
 
@@ -78,7 +80,7 @@ export const SetPostalCode: FunctionComponent<Props> = ({ route }) => {
           <Spacer.Column numberOfSpaces={6} />
 
           <StyledInput>
-            <Typo.Body>{_(t`Code postal`)}</Typo.Body>
+            <Typo.Body>{_(t`Ton code postal`)}</Typo.Body>
             <Spacer.Column numberOfSpaces={2} />
             <TextInput
               autoCapitalize="none"

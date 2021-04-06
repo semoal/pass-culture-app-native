@@ -11,6 +11,7 @@ export const InitialRoutingScreen: React.FC = () => {
   const { navigate } = useNavigation<UseNavigationType>()
   const { hideSplashScreen } = useSplashScreenContext()
   const initialScreenConfig = useGetInitialScreenConfig()
+  console.log('initialRoutingScreen')
 
   useEffect(() => {
     if (!initialScreenConfig || !hideSplashScreen) {

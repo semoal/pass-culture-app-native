@@ -239,6 +239,20 @@ export function Navigation(): JSX.Element {
             onPress={() => navigation.navigate('Maintenance')}
           />
         </Row>
+        <Row half>
+          <NavigationButton
+            title={`AcceptCGU Page`}
+            onPress={() =>
+              navigation.navigate('AcceptCgu', {
+                email: 'john.doe@example.com',
+                isNewsletterChecked: true,
+                password: 'password',
+                birthday: '12-2-1995',
+                postalCode: '35000',
+              })
+            }
+          />
+        </Row>
       </StyledContainer>
       <Spacer.BottomScreen />
     </ScrollView>
